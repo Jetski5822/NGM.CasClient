@@ -1,0 +1,317 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{1C98A639-5A86-4159-A351-664E8D3D537A}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>NGM.CasClient</RootNamespace>
+    <AssemblyName>NGM.CasClient</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Everest, Version=0.0.38.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>lib\everest\Everest.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\lib\aspnetmvc\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Module.txt" />
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Client\CasAuthenticationTicket.cs" />
+    <Compile Include="Client\CASClient.cs" />
+    <Compile Include="Client\Configuration\CasConfigurationException.cs" />
+    <Compile Include="Client\Extensions\RequestEvaluator.cs" />
+    <Compile Include="Client\Factories\TicketValidatorFactory.cs" />
+    <Compile Include="Client\GatewayStatus.cs" />
+    <Compile Include="Client\ICASClient.cs" />
+    <Compile Include="Client\ICasServices.cs" />
+    <Compile Include="Client\Security\Assertion.cs" />
+    <Compile Include="Client\Security\CasPrincipal.cs" />
+    <Compile Include="Client\Security\IAssertion.cs" />
+    <Compile Include="Client\Security\ICasPrincipal.cs" />
+    <Compile Include="DefaultSettingsUpdater.cs" />
+    <Compile Include="MissingSettingsBanner.cs" />
+    <Compile Include="Services\FormsAuthenticationService.cs" />
+    <Compile Include="Client\State\CacheProxyTicketManager.cs" />
+    <Compile Include="Client\State\CacheServiceTicketManager.cs" />
+    <Compile Include="Client\State\IProxyTicketManager.cs" />
+    <Compile Include="Client\State\IServiceTicketManager.cs" />
+    <Compile Include="Client\State\ProxyTicketManagerFactory.cs" />
+    <Compile Include="Client\State\ServiceTicketManagerFactory.cs" />
+    <Compile Include="Client\Utils\EnhancedUriBuilder.cs" />
+    <Compile Include="Client\Utils\HttpUtils.cs" />
+    <Compile Include="Client\Utils\UrlUtil.cs" />
+    <Compile Include="Client\Validation\CasSaml11Response.cs" />
+    <Compile Include="Client\Validation\SamlUtils.cs" />
+    <Compile Include="Client\Validation\Schema\Cas20\AuthenticationFailure.cs" />
+    <Compile Include="Client\Validation\Schema\Cas20\AuthenticationSuccess.cs" />
+    <Compile Include="Client\Validation\Schema\Cas20\ClearPass\ClearPassFailure.cs" />
+    <Compile Include="Client\Validation\Schema\Cas20\ClearPass\ClearPassResponse.cs" />
+    <Compile Include="Client\Validation\Schema\Cas20\ClearPass\ClearPassSuccess.cs" />
+    <Compile Include="Client\Validation\Schema\Cas20\ProxyFailure.cs" />
+    <Compile Include="Client\Validation\Schema\Cas20\ProxySuccess.cs" />
+    <Compile Include="Client\Validation\Schema\Cas20\ServiceResponse.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\ActionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\AdviceType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\AssertionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\Attribute\AttributeDesignatorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\Attribute\AttributeType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\AuthorityBindingType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\Condition\AudienceRestrictionConditionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\Condition\ConditionAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\Condition\ConditionsType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\Condition\DoNotCacheConditionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\DecisionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\EvidenceType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\NameIdentifierType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\Statement\StatementAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\SubjectConfirmationType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\SubjectLocalityType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\SubjectStatement\AttributeStatementType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\SubjectStatement\AuthenticationStatementType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\SubjectStatement\AuthorizationDecisionStatementType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\SubjectStatement\SubjectStatementAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Assertion\SubjectType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\Request\RequestAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\Request\RequestType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\Response\ResponseAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\Response\ResponseType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\StatusCodeType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\StatusDetailType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\StatusType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\SubjectQuery\AttributeQueryType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\SubjectQuery\AuthenticationQueryType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\SubjectQuery\AuthorizationDecisionQueryType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\SubjectQuery\QueryAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml11\Protocol\SubjectQuery\SubjectQueryAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\ActionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\AdviceType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\AssertionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Attribute\AttributeType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\AuthnContextType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\BaseIdAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Condition\AudienceRestrictionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Condition\ConditionAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Condition\ConditionsType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Condition\OneTimeUseType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Condition\ProxyRestrictionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\EncryptedElementType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\NameIdType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Statement\AttributeStatementType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Statement\AuthnStatementType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Statement\AuthzDecisionStatementType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\Statement\StatementAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\SubjectConfirmationDataType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\SubjectConfirmationType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\SubjectLocalityType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Assertion\SubjectType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\AuthnContextComparisonType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\DecisionType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\EvidenceType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\KeyInfoConfirmationDataType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\AdditionalMetadataLocationType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\AffiliationDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\AttributeAuthorityDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\AttributeConsumingServiceType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\AuthnAuthorityDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\ContactType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\ContactTypeType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\EndpointType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\EntitiesDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\EntityDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\ExtensionsType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\IdpSsoDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\IndexedEndpointType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\KeyDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\KeyTypes.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\localizedNameType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\localizedURIType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\OrganizationType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\PdpDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\RequestedAttributeType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\RoleDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\SpSsoDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Metadata\SsoDescriptorType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\NameIdPolicyType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Extensions\ExtensionsType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\IdpEntryType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\IdpListType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\RequestedAuthnContextType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Request\ArtifactResolveType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Request\AssertionIdRequestType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Request\AuthnRequestType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Request\LogoutRequestType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Request\ManageNameIdRequestType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Request\NameIdMappingRequestType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Request\RequestAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Request\RequestType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\Response\ResponseType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\ScopingType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\StatusCodeType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\StatusDetailType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\StatusResponse\ArtifactResponseType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\StatusResponse\NameIdMappingResponseType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\StatusResponse\StatusResponseType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\StatusType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\SubjectQuery\AttributeQueryType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\SubjectQuery\AuthnQueryType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\SubjectQuery\AuthzDecisionQueryType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\SubjectQuery\SubjectQueryAbstractType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\Protocol\TerminateType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\RelayStateType.cs" />
+    <Compile Include="Client\Validation\Schema\Saml20\ResponseType.cs" />
+    <Compile Include="Client\Validation\Schema\SoapEnvelope\Body.cs" />
+    <Compile Include="Client\Validation\Schema\SoapEnvelope\Detail.cs" />
+    <Compile Include="Client\Validation\Schema\SoapEnvelope\Envelope.cs" />
+    <Compile Include="Client\Validation\Schema\SoapEnvelope\Fault.cs" />
+    <Compile Include="Client\Validation\Schema\SoapEnvelope\Header.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\AgreementMethodType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\CipherDataType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\CipherReferenceType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\EncryptedDataType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\EncryptedKeyType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\EncryptedType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\EncryptionMethodType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\EncryptionPropertiesType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\EncryptionPropertyType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\ReferenceList.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\ReferenceType.cs" />
+    <Compile Include="Client\Validation\Schema\Xenc\TransformsType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\CanonicalizationMethodType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\DigestMethodType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\DsaKeyValueType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\KeyInfoType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\KeyValueType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\ManifestType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\ObjectType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\PgpDataType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\ReferenceType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\RetrievalMethodType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\RsaKeyValueType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\SignatureMethodType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\SignaturePropertiesType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\SignaturePropertyType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\SignatureType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\SignatureValueType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\SignedInfoType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\SpkiDataType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\TransformsType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\TransformType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\X509DataType.cs" />
+    <Compile Include="Client\Validation\Schema\XmlDsig\X509IssuerSerialType.cs" />
+    <Compile Include="Client\Validation\TicketValidationException.cs" />
+    <Compile Include="Client\Validation\TicketValidator\AbstractCasProtocolTicketValidator.cs" />
+    <Compile Include="Client\Validation\TicketValidator\AbstractUrlTicketValidator.cs" />
+    <Compile Include="Client\Validation\TicketValidator\Cas10TicketValidator.cs" />
+    <Compile Include="Client\Validation\TicketValidator\Cas20ServiceTicketValidator.cs" />
+    <Compile Include="Client\Validation\TicketValidator\ITicketValidator.cs" />
+    <Compile Include="Client\Validation\TicketValidator\Saml11TicketValidator.cs" />
+    <Compile Include="Filters\CASActionFilter.cs" />
+    <Compile Include="Filters\CASAuthorizationFilter.cs" />
+    <Compile Include="Handlers\CASSettingsPartHandler.cs" />
+    <Compile Include="Migrations.cs" />
+    <Compile Include="Models\CASSettingsPart.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\EditorTemplates\Parts\CASClient.CASSettings.cshtml" />
+    <Content Include="Views\Web.config" />
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Orchard\Orchard.Framework.csproj">
+      <Project>{2d1d92bb-4555-4cbe-8d0e-63563d6ce4c6}</Project>
+      <Name>Orchard.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\Orchard.Core.csproj">
+      <Project>{9916839c-39fc-4ceb-a5af-89ca7e87119f}</Project>
+      <Name>Orchard.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orchard.Users\Orchard.Users.csproj">
+      <Project>{79AED36E-ABD0-4747-93D3-8722B042454B}</Project>
+      <Name>Orchard.Users</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>59136</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:19292/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://www.orchardproject.net</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

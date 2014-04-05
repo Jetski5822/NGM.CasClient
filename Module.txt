@@ -1,0 +1,8 @@
+﻿Name: Cas Client
+AntiForgery: enabled
+Author: Nicholas Mayne
+Website: https://github.com/Jetski5822/NGM.CasClient
+Version: 1.0
+OrchardVersion: 1.6.1
+Description: Cas Client for Orchard CMS
+Category: Authentication

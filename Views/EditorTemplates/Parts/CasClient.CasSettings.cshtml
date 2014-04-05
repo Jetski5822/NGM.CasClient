@@ -1,0 +1,68 @@
+@using System.Web.Mvc.Html
+@model NGM.CasClient.Models.CASSettingsPartRecord
+
+<fieldset>
+    <legend>@T("CAS Settings")</legend>
+    <div>
+        @Html.EditorFor(m => m.ProcessIncomingSingleSignOutRequests) 
+        <label class="forcheckbox" for="@Html.FieldIdFor(m => m.ProcessIncomingSingleSignOutRequests)">@T("Process Incoming Single Sign Out Requests")</label>
+    </div>
+    <div>
+        <label for="@Html.FieldIdFor(m => m.TicketValidatorName)">@T("Ticket Validator Name")</label>
+        <select id="@Html.FieldIdFor(m => m.TicketValidatorName)" name="@Html.FieldNameFor(m => m.TicketValidatorName)">
+            @Html.SelectOption(Model.TicketValidatorName, "Cas10", T("Cas10").ToString())
+            @Html.SelectOption(Model.TicketValidatorName, "Cas20", T("Cas20").ToString())
+            @Html.SelectOption(Model.TicketValidatorName, "Saml11", T("Saml11").ToString())
+        </select>
+    </div>
+    <div>
+        @Html.LabelFor(m => m.GatewayParameterName, @T("Gateway Parameter Name"))
+        @Html.EditorFor(m => m.GatewayParameterName)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.ArtifactParameterName, @T("Artifact Parameter Name"))
+        @Html.EditorFor(m => m.ArtifactParameterName)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.GatewayStatusCookieName, @T("Gateway Status Cookie Name"))
+        @Html.EditorFor(m => m.GatewayStatusCookieName)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.CasServerUrlPrefix, @T("Cas Server Url Prefix"))
+        @Html.TextBoxFor(m => m.CasServerUrlPrefix, new { @class = "textMedium" })
+        <span class="hint">@T("An example would be 'https://sso.demo.pwa.cegedim.com/sso/'")</span>
+    </div>
+    <div>
+        @Html.LabelFor(m => m.CookiesRequiredUrl, @T("Cookies Required Url"))
+        @Html.TextBoxFor(m => m.CookiesRequiredUrl, new { @class = "textMedium" })
+    </div>
+    <div>
+        @Html.EditorFor(m => m.Gateway) 
+        <label class="forcheckbox" for="@Html.FieldIdFor(m => m.Gateway)">@T("Gateway")</label>
+    </div>
+    <div>
+        @Html.EditorFor(m => m.Renew) 
+        <label class="forcheckbox" for="@Html.FieldIdFor(m => m.Renew)">@T("Renew Ticket")</label>
+    </div>
+    <div>
+        @Html.LabelFor(m => m.FormsLoginUrl, @T("Forms Login Url"))
+        @Html.TextBoxFor(m => m.FormsLoginUrl, new { @class = "textMedium" })
+        <span class="hint">@T("An example would be 'https://sso.demo.pwa.cegedim.com/sso/login'")</span>
+    </div>
+    <div>
+        @Html.LabelFor(m => m.NotAuthorizedUrl, @T("Not Authorized Url"))
+        @Html.TextBoxFor(m => m.NotAuthorizedUrl, new { @class = "textMedium" })
+    </div>
+    <div>
+        @Html.LabelFor(m => m.ServiceTicketManager, @T("Service Ticket Manager"))
+        @Html.EditorFor(m => m.ServiceTicketManager)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.ProxyTicketManager, @T("Proxy Ticket Manager"))
+        @Html.EditorFor(m => m.ProxyTicketManager)
+    </div>
+    <div>
+        @Html.LabelFor(m => m.TicketTimeTolerance, @T("Ticket Time Tolerance"))
+        @Html.EditorFor(m => m.TicketTimeTolerance)
+    </div>
+</fieldset>
