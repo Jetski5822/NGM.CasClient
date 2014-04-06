@@ -24,7 +24,7 @@ namespace NGM.CasClient {
         }
 
         public void Enabled(Feature feature) {
-            if (feature.Descriptor.Id != "Atlantis.CasClient")
+            if (feature.Descriptor.Id != "NGM.CasClient")
                 return;
 
             var settings = _orchardServices.WorkContext.CurrentSite.As<CASSettingsPart>();
