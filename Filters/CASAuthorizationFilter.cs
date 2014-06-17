@@ -1,20 +1,25 @@
-﻿using System.Web;
+﻿using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web.Http.Controllers;
 using System.Web.Mvc;
 using JetBrains.Annotations;
 using NGM.CasClient.Client;
 using NGM.CasClient.Client.Extensions;
+using Orchard;
 using Orchard.Localization;
 using Orchard.Logging;
 using Orchard.Mvc.Filters;
 
 namespace NGM.CasClient.Filters {
     [UsedImplicitly]
-    public class CASAuthorizationFilter : FilterProvider, IAuthorizationFilter {
+    public class CasAuthorizationFilter : FilterProvider, System.Web.Mvc.IAuthorizationFilter, System.Web.Http.Filters.IAuthorizationFilter {
         private readonly ICASClient _casClient;
         private readonly ICasServices _casServices;
         private readonly IRequestEvaluator _requestEvaluator;
 
-        public CASAuthorizationFilter(
+        public CasAuthorizationFilter(
             ICASClient casClient,
             ICasServices casServices,
             IRequestEvaluator requestEvaluator) {
@@ -34,22 +39,39 @@ namespace NGM.CasClient.Filters {
                 return;
             }
 
-            HttpContextBase context = filterContext.HttpContext;
-            HttpRequestBase request = context.Request;
+            var workContext = filterContext.RequestContext.GetWorkContext();
 
-            if (!_requestEvaluator.GetRequestIsAppropriateForCasAuthentication(context)) {
-                Logger.Debug("No EndRequest processing for " + request.RawUrl);
+            ProcessAuthorization(workContext);
+        }
+
+        public bool AllowMultiple {
+            get { return false; }
+        }
+
+        public Task<HttpResponseMessage> ExecuteAuthorizationFilterAsync(HttpActionContext actionContext, CancellationToken cancellationToken,
+            Func<Task<HttpResponseMessage>> continuation) {
+
+                var workContext = actionContext.ControllerContext.GetWorkContext();
+
+                ProcessAuthorization(workContext);
+
+                return continuation();
+        }
+
+        private void ProcessAuthorization(WorkContext workContext) {
+            if (!_requestEvaluator.GetRequestIsAppropriateForCasAuthentication(workContext)) {
+                Logger.Debug("No EndRequest processing for " + workContext.HttpContext.Request.RawUrl);
                 return;
             }
 
-            if (_requestEvaluator.GetRequestHasCasTicket(context)) {
+            if (_requestEvaluator.GetRequestHasCasTicket(workContext)) {
                 Logger.Information("Processing Proxy Callback request");
-                _casClient.ProcessTicketValidation(context);
+                _casClient.ProcessTicketValidation(workContext);
             }
 
-            Logger.Debug("Starting AuthenticateRequest for " + request.RawUrl);
-            _casClient.ProcessRequestAuthentication(context);
-            Logger.Debug("Ending AuthenticateRequest for " + request.RawUrl);
+            Logger.Debug("Starting AuthenticateRequest for " + workContext.HttpContext.Request.RawUrl);
+            _casClient.ProcessRequestAuthentication(workContext);
+            Logger.Debug("Ending AuthenticateRequest for " + workContext.HttpContext.Request.RawUrl);
         }
     }
 }

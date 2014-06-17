@@ -11,67 +11,67 @@ namespace NGM.CasClient.Client.Extensions {
         /// Determines whether the request has a CAS ticket in the URL
         /// </summary>
         /// <returns>True if the request URL contains a CAS ticket, otherwise False</returns>
-        bool GetRequestHasCasTicket(HttpContextBase context);
+        bool GetRequestHasCasTicket(WorkContext context);
 
         /// <summary>
         /// Determines whether the request is a return request from the 
         /// CAS server containing a CAS ticket
         /// </summary>
         /// <returns>True if the request URL contains a CAS ticket, otherwise False</returns>
-        bool GetRequestIsCasAuthenticationResponse(HttpContextBase context);
+        bool GetRequestIsCasAuthenticationResponse(WorkContext context);
 
         /// <summary>
         /// Determines whether the request contains the GatewayParameterName defined in 
         /// web.config or the default value 'gatewayResponse'
         /// </summary>
         /// <returns>True if the request contains the GatewayParameterName, otherwise False</returns>
-        bool GetRequestHasGatewayParameter(HttpContextBase context);
+        bool GetRequestHasGatewayParameter(WorkContext context);
 
         /// <summary>
         /// Determines whether the request is an inbound proxy callback verifications 
         /// from the CAS server
         /// </summary>
         /// <returns>True if the request is a proxy callback verificiation, otherwise False</returns>
-        bool GetRequestIsProxyResponse(HttpContextBase context);
+        bool GetRequestIsProxyResponse(WorkContext context);
 
         /// <summary>
         /// Determines whether the current request requires a Gateway authentication redirect
         /// </summary>
         /// <returns>True if the request requires Gateway authentication, otherwise False</returns>
-        bool GetRequestRequiresGateway(HttpContextBase context, GatewayStatus status);
+        bool GetRequestRequiresGateway(WorkContext context, GatewayStatus status);
 
         /// <summary>
         /// Determines whether the user's browser refuses to accept session cookies
         /// </summary>
         /// <returns>True if the browser does not allow session cookies, otherwise False</returns>
-        bool GetUserDoesNotAllowSessionCookies(HttpContextBase context, GatewayStatus status);
+        bool GetUserDoesNotAllowSessionCookies(WorkContext context, GatewayStatus status);
 
         /// <summary>
         /// Determines whether the current request is unauthorized
         /// </summary>
         /// <returns>True if the request is unauthorized, otherwise False</returns>
-        bool GetRequestIsUnauthorized(HttpContextBase context);
+        bool GetRequestIsUnauthorized(WorkContext context);
 
         /// <summary>
         /// Determines whether the current request is unauthenticated
         /// </summary>
         /// <returns>True if the request is unauthenticated, otherwise False</returns>
-        bool GetRequestIsUnAuthenticated(HttpContextBase context);
+        bool GetRequestIsUnAuthenticated(WorkContext context);
 
         /// <summary>
         /// Determines whether the current request will be redirected to the 
         /// CAS login page
         /// </summary>
         /// <returns>True if the request will be redirected, otherwise False.</returns>
-        bool GetResponseIsCasLoginRedirect(HttpContextBase context);
+        bool GetResponseIsCasLoginRedirect(WorkContext context);
 
         /// <summary>
         /// Determines whether the request is a CAS Single Sign Out request
         /// </summary>
         /// <returns>True if the request is a CAS Single Sign Out request, otherwise False</returns>
-        bool GetRequestIsCasSingleSignOut(HttpContextBase context);
+        bool GetRequestIsCasSingleSignOut(WorkContext context);
 
-        bool GetRequestIsAppropriateForCasAuthentication(HttpContextBase context);
+        bool GetRequestIsAppropriateForCasAuthentication(WorkContext context);
     }
 
     public class RequestEvaluator : IRequestEvaluator {
@@ -106,8 +106,8 @@ namespace NGM.CasClient.Client.Extensions {
         /// Determines whether the request has a CAS ticket in the URL
         /// </summary>
         /// <returns>True if the request URL contains a CAS ticket, otherwise False</returns>
-        public bool GetRequestHasCasTicket(HttpContextBase context) {
-            HttpRequestBase request = context.Request;
+        public bool GetRequestHasCasTicket(WorkContext context) {
+            HttpRequestBase request = context.HttpContext.Request;
 
             bool result =
             (
@@ -123,8 +123,8 @@ namespace NGM.CasClient.Client.Extensions {
         /// CAS server containing a CAS ticket
         /// </summary>
         /// <returns>True if the request URL contains a CAS ticket, otherwise False</returns>
-        public bool GetRequestIsCasAuthenticationResponse(HttpContextBase context) {
-            HttpRequestBase request = context.Request;
+        public bool GetRequestIsCasAuthenticationResponse(WorkContext context) {
+            HttpRequestBase request = context.HttpContext.Request;
 
             int artifactIndex = request.Url.AbsoluteUri.IndexOf(_casServices.Settings.ArtifactParameterName);
 
@@ -146,8 +146,8 @@ namespace NGM.CasClient.Client.Extensions {
         /// web.config or the default value 'gatewayResponse'
         /// </summary>
         /// <returns>True if the request contains the GatewayParameterName, otherwise False</returns>
-        public bool GetRequestHasGatewayParameter(HttpContextBase context) {
-            HttpRequestBase request = context.Request;
+        public bool GetRequestHasGatewayParameter(WorkContext context) {
+            HttpRequestBase request = context.HttpContext.Request;
 
             bool requestContainsGatewayParameter = !String.IsNullOrEmpty(request.QueryString[_casServices.Settings.GatewayParameterName]);
             bool gatewayParameterValueIsTrue = (request.QueryString[_casServices.Settings.GatewayParameterName] == "true");
@@ -166,8 +166,8 @@ namespace NGM.CasClient.Client.Extensions {
         /// from the CAS server
         /// </summary>
         /// <returns>True if the request is a proxy callback verificiation, otherwise False</returns>
-        public bool GetRequestIsProxyResponse(HttpContextBase context) {
-            HttpRequestBase request = context.Request;
+        public bool GetRequestIsProxyResponse(WorkContext context) {
+            HttpRequestBase request = context.HttpContext.Request;
 
             bool requestContainsProxyCallbackParameter = !String.IsNullOrEmpty(request.QueryString[_casServices.Settings.ProxyCallbackParameterName]);
             bool proxyCallbackParameterValueIsTrue = (request.QueryString[_casServices.Settings.ProxyCallbackParameterName] == "true");
@@ -185,8 +185,8 @@ namespace NGM.CasClient.Client.Extensions {
         /// Determines whether the current request requires a Gateway authentication redirect
         /// </summary>
         /// <returns>True if the request requires Gateway authentication, otherwise False</returns>
-        public bool GetRequestRequiresGateway(HttpContextBase context, GatewayStatus status) {
-            HttpRequestBase request = context.Request;
+        public bool GetRequestRequiresGateway(WorkContext context, GatewayStatus status) {
+            HttpRequestBase request = context.HttpContext.Request;
 
             bool gatewayEnabled = _casServices.Settings.Gateway;
             bool gatewayWasNotAttempted = (status == GatewayStatus.NotAttempted);
@@ -213,7 +213,7 @@ namespace NGM.CasClient.Client.Extensions {
         /// Determines whether the user's browser refuses to accept session cookies
         /// </summary>
         /// <returns>True if the browser does not allow session cookies, otherwise False</returns>
-        public bool GetUserDoesNotAllowSessionCookies(HttpContextBase context, GatewayStatus status) {
+        public bool GetUserDoesNotAllowSessionCookies(WorkContext context, GatewayStatus status) {
             // If the request has a gateway parameter but the cookie does not
             // reflect the fact that gateway was attempted, then cookies must
             // be disabled.
@@ -238,8 +238,8 @@ namespace NGM.CasClient.Client.Extensions {
         /// Determines whether the current request is unauthorized
         /// </summary>
         /// <returns>True if the request is unauthorized, otherwise False</returns>
-        public bool GetRequestIsUnauthorized(HttpContextBase context) {
-            HttpResponseBase response = context.Response;
+        public bool GetRequestIsUnauthorized(WorkContext context) {
+            HttpResponseBase response = context.HttpContext.Response;
 
             bool responseIsBeingRedirected = (response.StatusCode == 302);
             bool userIsAuthenticated = GetUserIsAuthenticated();
@@ -259,7 +259,7 @@ namespace NGM.CasClient.Client.Extensions {
         /// Determines whether the current request is unauthenticated
         /// </summary>
         /// <returns>True if the request is unauthenticated, otherwise False</returns>
-        public bool GetRequestIsUnAuthenticated(HttpContextBase context) {
+        public bool GetRequestIsUnAuthenticated(WorkContext context) {
             bool userIsNotAuthenticated = !GetUserIsAuthenticated();
             bool responseIsCasLoginRedirect = GetResponseIsCasLoginRedirect(context);
 
@@ -277,8 +277,8 @@ namespace NGM.CasClient.Client.Extensions {
         /// CAS login page
         /// </summary>
         /// <returns>True if the request will be redirected, otherwise False.</returns>
-        public bool GetResponseIsCasLoginRedirect(HttpContextBase context) {
-            HttpResponseBase response = context.Response;
+        public bool GetResponseIsCasLoginRedirect(WorkContext context) {
+            HttpResponseBase response = context.HttpContext.Response;
 
             bool requestDoesNotHaveCasTicket = !GetRequestHasCasTicket(context);
             bool responseIsBeingRedirected = (response.StatusCode == 302);
@@ -298,8 +298,8 @@ namespace NGM.CasClient.Client.Extensions {
         /// Determines whether the request is a CAS Single Sign Out request
         /// </summary>
         /// <returns>True if the request is a CAS Single Sign Out request, otherwise False</returns>
-        public bool GetRequestIsCasSingleSignOut(HttpContextBase context) {
-            HttpRequestBase request = context.Request;
+        public bool GetRequestIsCasSingleSignOut(WorkContext context) {
+            HttpRequestBase request = context.HttpContext.Request;
 
             bool requestIsFormPost = (request.RequestType == "POST");
             bool haveLogoutRequest = !string.IsNullOrEmpty(request.Params["logoutRequest"]);
@@ -326,8 +326,8 @@ namespace NGM.CasClient.Client.Extensions {
         /// Determines whether the request is for the CookiesRequiredUrl defined in web.config
         /// </summary>
         /// <returns>True if the request is to the CookiesRequiredUrl, otherwise False</returns>
-        private bool GetRequestIsCookiesRequiredUrl(HttpContextBase context) {
-            HttpRequestBase request = context.Request;
+        private bool GetRequestIsCookiesRequiredUrl(WorkContext context) {
+            HttpRequestBase request = context.HttpContext.Request;
 
             bool cookiesRequiredUrlIsDefined = !String.IsNullOrEmpty(_casServices.Settings.CookiesRequiredUrl);
             bool requestIsCookiesRequiredUrl = cookiesRequiredUrlIsDefined && request.RawUrl.StartsWith(_urlUtil.ResolveUrl(_casServices.Settings.CookiesRequiredUrl), true, CultureInfo.InvariantCulture);
@@ -347,9 +347,9 @@ namespace NGM.CasClient.Client.Extensions {
         /// ASP.NET handlers (i.e., web resources, trace handler).
         /// </summary>
         /// <returns>True if the request is appropriate for CAS authentication, otherwise False</returns>
-        public bool GetRequestIsAppropriateForCasAuthentication(HttpContextBase context) {
-            HttpRequestBase request = context.Request;
-            HttpResponseBase response = context.Response;
+        public bool GetRequestIsAppropriateForCasAuthentication(WorkContext workContext) {
+            HttpRequestBase request = workContext.HttpContext.Request;
+            HttpResponseBase response = workContext.HttpContext.Response;
 
             string contentType = response.ContentType.ToLowerInvariant();
             string fileName = request.Url.Segments[request.Url.Segments.Length - 1];

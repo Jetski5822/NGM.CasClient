@@ -14,7 +14,7 @@ namespace NGM.CasClient.Client {
         /// <param name="url">The foreign service to redirect to</param>
         /// <exception cref="ArgumentNullException">The url supplied is null</exception>
         /// <exception cref="ArgumentException">The url supplied is empty</exception>
-        void ProxyRedirect(HttpContextBase context, string url);
+        void ProxyRedirect(WorkContext context, string url);
 
         /// <summary>
         /// Obtain a Proxy ticket and redirect to the foreign service url with 
@@ -28,7 +28,7 @@ namespace NGM.CasClient.Client {
         /// </param>
         /// <exception cref="ArgumentNullException">The url supplied is null</exception>
         /// <exception cref="ArgumentException">The url supplied is empty</exception>
-        void ProxyRedirect(HttpContextBase context, string url, bool endResponse);
+        void ProxyRedirect(WorkContext context, string url, bool endResponse);
 
         /// <summary>
         /// Obtain a Proxy ticket and redirect to the foreign service url with 
@@ -45,7 +45,7 @@ namespace NGM.CasClient.Client {
         /// <exception cref="ArgumentException">
         /// The url or proxyTicketUrlParametersupplied is empty
         /// </exception>
-        void ProxyRedirect(HttpContextBase context, string url, string proxyTicketUrlParameter);
+        void ProxyRedirect(WorkContext context, string url, string proxyTicketUrlParameter);
 
         /// <summary>
         /// </summary>
@@ -63,7 +63,7 @@ namespace NGM.CasClient.Client {
         /// <exception cref="ArgumentException">
         /// The url or proxyTicketUrlParametersupplied is empty
         /// </exception>
-        void ProxyRedirect(HttpContextBase context, string url, string proxyTicketUrlParameter, bool endResponse);
+        void ProxyRedirect(WorkContext context, string url, string proxyTicketUrlParameter, bool endResponse);
 
         /// <summary>
         /// Attempts to connect to the CAS server to retrieve a proxy ticket 
@@ -81,7 +81,7 @@ namespace NGM.CasClient.Client {
         /// <returns>
         /// A proxy ticket for the target Url or an empty string if the request failed.
         /// </returns>
-        string GetProxyTicketIdFor(HttpContextBase context, string targetServiceUrl);
+        string GetProxyTicketIdFor(WorkContext context, string targetServiceUrl);
 
         /// <summary>
         /// Redirects the current request to the CAS Login page
@@ -108,13 +108,13 @@ namespace NGM.CasClient.Client {
         /// Redirects the current request back to the requested page without
         /// the CAS ticket artifact in the URL.
         /// </summary>
-        RedirectResult RedirectFromLoginCallback(HttpContextBase context, ActionResult result);
+        RedirectResult RedirectFromLoginCallback(WorkContext context, ActionResult result);
 
         /// <summary>
         /// Redirects the current request back to the requested page without
         /// the gateway callback artifact in the URL.
         /// </summary>
-        RedirectResult RedirectFromFailedGatewayCallback(HttpContextBase context);
+        RedirectResult RedirectFromFailedGatewayCallback(WorkContext context);
 
         /// <summary>
         /// Attempt to perform a CAS gateway authentication.  This causes a transparent
@@ -130,7 +130,7 @@ namespace NGM.CasClient.Client {
         /// unnecessary.  This property allows you to override the behavior and 
         /// perform a redirection regardless of whether it has already been attempted.
         /// </param>
-        RedirectResult GatewayAuthenticate(HttpContextBase context, bool ignoreGatewayStatusCookie);
+        RedirectResult GatewayAuthenticate(WorkContext context, bool ignoreGatewayStatusCookie);
 
         /// <summary>
         /// Logs the user out of the application and attempts to perform a Single Sign 
@@ -144,7 +144,7 @@ namespace NGM.CasClient.Client {
         /// PHP) varies based on the client implementation.  Consult the Jasig wiki
         /// for more details.
         /// </summary>
-        void SingleSignOut(HttpContextBase context);
+        void SingleSignOut(WorkContext context);
 
         /// <summary>
         /// Process SingleSignOut requests originating from another web application by removing the ticket 
@@ -156,7 +156,7 @@ namespace NGM.CasClient.Client {
         /// Boolean indicating whether the request was a SingleSignOut request, regardless of
         /// whether or not the request actually required processing (non-existent/already expired).
         /// </returns>
-        ActionResult ProcessSingleSignOutRequest(HttpContextBase context);
+        ActionResult ProcessSingleSignOutRequest(WorkContext context);
 
         /// <summary>
         /// Process a Proxy Callback request from the CAS server.  Proxy Callback requests occur as a part
@@ -172,7 +172,7 @@ namespace NGM.CasClient.Client {
         /// A Boolean indicating whether or not the proxy callback request is valid and mapped to a valid,
         /// outstanding Proxy Granting Ticket IOU.
         /// </returns>
-        ActionResult ProcessProxyCallbackRequest(HttpContextBase context);
+        ActionResult ProcessProxyCallbackRequest(WorkContext context);
 
         /// <summary>
         /// Validates a ticket contained in the URL, presumably generated by
@@ -185,7 +185,7 @@ namespace NGM.CasClient.Client {
         /// method).  If the validation fails, the authentication status remains 
         /// unchanged (generally the user is and remains anonymous).
         /// </summary>
-        void ProcessTicketValidation(HttpContextBase context);
+        void ProcessTicketValidation(WorkContext context);
 
         /// <summary>
         /// Attempts to authenticate requests subsequent to the initial authentication
@@ -197,7 +197,7 @@ namespace NGM.CasClient.Client {
         /// are set with a ICasPrincipal and the current request is considered 
         /// authenticated.  Otherwise, the current request is effectively anonymous.
         /// </summary>
-        void ProcessRequestAuthentication(HttpContextBase context);
+        void ProcessRequestAuthentication(WorkContext context);
 
         /// <summary>
         /// Attempts to set the GatewayStatus client cookie.  If the cookie is not
@@ -210,7 +210,7 @@ namespace NGM.CasClient.Client {
         /// will result in a round-trip to the CAS server.
         /// </summary>
         /// <param name="gatewayStatus">The GatewayStatus to attempt to store</param>
-        void SetGatewayStatusCookie(HttpContextBase context, GatewayStatus gatewayStatus);
+        void SetGatewayStatusCookie(WorkContext context, GatewayStatus gatewayStatus);
 
         /// <summary>
         /// Retrieves the GatewayStatus from the client cookie.
@@ -219,7 +219,7 @@ namespace NGM.CasClient.Client {
         /// The GatewayStatus stored in the cookie if present, otherwise 
         /// GatewayStatus.NotAttempted.
         /// </returns>
-        GatewayStatus GetGatewayStatus(HttpContextBase context);
+        GatewayStatus GetGatewayStatus(WorkContext context);
 
         /// <summary>
         /// Sends a blank and expired FormsAuthentication cookie to the 
@@ -229,14 +229,14 @@ namespace NGM.CasClient.Client {
         /// code from being able to access it during the execution of the 
         /// current request.
         /// </summary>
-        void ClearAuthCookie(HttpContextBase context);
+        void ClearAuthCookie(WorkContext context);
 
         /// <summary>
         /// Encrypts a FormsAuthenticationTicket in an HttpCookie (using 
         /// GetAuthCookie) and includes it in the response.
         /// </summary>
         /// <param name="clientTicket">The FormsAuthenticationTicket to encode</param>
-        void SetAuthCookie(HttpContextBase context, FormsAuthenticationTicket clientTicket);
+        void SetAuthCookie(WorkContext context, FormsAuthenticationTicket clientTicket);
 
         /// <summary>
         /// Creates an HttpCookie containing an encrypted FormsAuthenticationTicket,
@@ -244,7 +244,7 @@ namespace NGM.CasClient.Client {
         /// </summary>
         /// <param name="ticket">The FormsAuthenticationTicket to encode</param>
         /// <returns>An HttpCookie containing the encrypted FormsAuthenticationTicket</returns>
-        HttpCookie GetAuthCookie(HttpContextBase context, FormsAuthenticationTicket ticket);
+        HttpCookie GetAuthCookie(WorkContext context, FormsAuthenticationTicket ticket);
 
         /// <summary>
         /// Looks for a FormsAuthentication cookie and attempts to
@@ -256,6 +256,6 @@ namespace NGM.CasClient.Client {
         /// Returns the FormsAuthenticationTicket contained in the 
         /// cookie or null if any issues are encountered.
         /// </returns>
-        FormsAuthenticationTicket GetFormsAuthenticationTicket(HttpContextBase context);
+        FormsAuthenticationTicket GetFormsAuthenticationTicket(WorkContext context);
     }
 }
