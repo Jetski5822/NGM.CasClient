@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Orchard.Validation;
+using Orchard.WebApi.Filters;
 
 namespace NGM.CasClient.Filters.WebApi {
-    public abstract class WebApiActionFilter : IActionFilter {
+    public abstract class WebApiActionFilter : IApiFilterProvider, IActionFilter {
         public bool AllowMultiple {
             get { return false; }
         }

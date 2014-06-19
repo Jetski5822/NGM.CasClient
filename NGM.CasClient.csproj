@@ -88,7 +88,6 @@
     <Compile Include="Filters\WebApi\TaskHelpersExtensions.cs" />
     <Compile Include="Filters\WebApi\WebApiActionFilter.cs" />
     <Compile Include="MissingSettingsBanner.cs" />
-    <Compile Include="Routes.cs" />
     <Compile Include="Services\FormsAuthenticationService.cs" />
     <Compile Include="Client\State\CacheProxyTicketManager.cs" />
     <Compile Include="Client\State\CacheServiceTicketManager.cs" />

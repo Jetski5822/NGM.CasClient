@@ -11,10 +11,11 @@ using Orchard;
 using Orchard.Localization;
 using Orchard.Logging;
 using Orchard.Mvc.Filters;
+using Orchard.WebApi.Filters;
 
 namespace NGM.CasClient.Filters {
     [UsedImplicitly]
-    public class CasAuthorizationFilter : FilterProvider, System.Web.Mvc.IAuthorizationFilter, System.Web.Http.Filters.IAuthorizationFilter {
+    public class CasAuthorizationFilter : FilterProvider, IAuthorizationFilter, IHttpAuthorizationFilter {
         private readonly ICASClient _casClient;
         private readonly ICasServices _casServices;
         private readonly IRequestEvaluator _requestEvaluator;
