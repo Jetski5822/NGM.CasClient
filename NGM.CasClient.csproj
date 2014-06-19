@@ -84,8 +84,7 @@
     <Compile Include="DefaultSettingsUpdater.cs" />
     <Compile Include="Filters\CasWebApiActionFilter.cs" />
     <Compile Include="Filters\ICASActionFilter.cs" />
-    <Compile Include="Filters\WebApi\TaskHelpers.cs" />
-    <Compile Include="Filters\WebApi\TaskHelpersExtensions.cs" />
+    <Compile Include="Filters\IHttpAuthorizationFilter.cs" />
     <Compile Include="Filters\WebApi\WebApiActionFilter.cs" />
     <Compile Include="MissingSettingsBanner.cs" />
     <Compile Include="Services\FormsAuthenticationService.cs" />
