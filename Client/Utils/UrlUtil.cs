@@ -261,7 +261,7 @@ namespace NGM.CasClient.Client.Utils {
             }
 
             EnhancedUriBuilder ub = new EnhancedUriBuilder(EnhancedUriBuilder.Combine(Settings.CasServerUrlPrefix, _ticketValidatorFactory.Value.TicketValidator.UrlSuffix));
-            ub.QueryItems.Add(_ticketValidatorFactory.Value.TicketValidator.ServiceParameterName, ConstructServiceUrl(gateway));
+            ub.QueryItems.Add(_ticketValidatorFactory.Value.TicketValidator.ServiceParameterName, HttpUtility.UrlEncode(ConstructServiceUrl(gateway)));
             ub.QueryItems.Add(_ticketValidatorFactory.Value.TicketValidator.ArtifactParameterName, HttpUtility.UrlEncode(serviceTicket));
 
             if (renew) {
