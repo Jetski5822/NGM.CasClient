@@ -15,8 +15,6 @@ namespace NGM.CasClient.Client {
     /// <author>Scott Holodak</author>
     [Serializable]
     public sealed class CasAuthenticationTicket {
-        private readonly IClock _clock;
-
         /// <summary>
         /// The NetId username used to authenticate against the CAS server.  This
         /// information is retrieved via ticket validation and should not from 
@@ -95,7 +93,7 @@ namespace NGM.CasClient.Client {
         /// </summary>
         public bool Expired {
             get {
-                return (_clock.UtcNow.CompareTo(ValidUntilDate) > 0);
+                return (DateTime.UtcNow.CompareTo(ValidUntilDate) > 0);
             }
         }
 
@@ -113,10 +111,13 @@ namespace NGM.CasClient.Client {
         /// <param name="originatingServiceName">ServiceName used during CAS authentication/validation</param>
         /// <param name="clientHostAddress">IP address of the client initiating the authentication request</param>
         /// <param name="assertion">CAS assertion returned from the CAS server during ticket validation</param>
-        /// <param name="settings"></param>
         /// <param name="clock"></param>
-        public CasAuthenticationTicket(string serviceTicket, string originatingServiceName, string clientHostAddress, IAssertion assertion, IClock clock) {
-            _clock = clock;
+        public CasAuthenticationTicket(
+            string serviceTicket, 
+            string originatingServiceName, 
+            string clientHostAddress, 
+            IAssertion assertion,
+            DateTime validFromDate) {
 
             Proxies = new List<string>();
 
@@ -130,7 +131,7 @@ namespace NGM.CasClient.Client {
                 ValidFromDate = assertion.ValidFromDate;
             }
             else {
-                ValidFromDate = _clock.UtcNow;
+                ValidFromDate = validFromDate;
             }
 
             DateTime localValidUntil = ValidFromDate.Add(TimeSpan.FromDays(30));

@@ -15,7 +15,6 @@ using NGM.CasClient.Client.Utils;
 using NGM.CasClient.Client.Validation;
 using NGM.CasClient.Client.Validation.Schema.Cas20;
 using NGM.CasClient.Client.Validation.TicketValidator;
-using Orchard;
 using Orchard.Environment.Configuration;
 using Orchard.Localization;
 using Orchard.Logging;
@@ -85,11 +84,12 @@ namespace NGM.CasClient.Client {
         /// that ticket included in the url.  The foreign service must be configured 
         /// to accept the ticket.
         /// </summary>
+        /// <param name="httpContext"></param>
         /// <param name="url">The foreign service to redirect to</param>
         /// <exception cref="ArgumentNullException">The url supplied is null</exception>
         /// <exception cref="ArgumentException">The url supplied is empty</exception>
-        public void ProxyRedirect(WorkContext context, string url) {
-            ProxyRedirect(context, url, "ticket", false);
+        public void ProxyRedirect(HttpContextBase httpContext, string url) {
+            ProxyRedirect(httpContext, url, "ticket", false);
         }
 
         /// <summary>
@@ -97,15 +97,16 @@ namespace NGM.CasClient.Client {
         /// that ticket included in the url.  The foreign service must be configured 
         /// to accept the ticket.
         /// </summary>
+        /// <param name="httpContext"></param>
         /// <param name="url">The foreign service to redirect to</param>
         /// <param name="endResponse">
-        /// Boolean indicating whether or not to short circuit the remaining request 
-        /// pipeline events
+        ///     Boolean indicating whether or not to short circuit the remaining request 
+        ///     pipeline events
         /// </param>
         /// <exception cref="ArgumentNullException">The url supplied is null</exception>
         /// <exception cref="ArgumentException">The url supplied is empty</exception>
-        public void ProxyRedirect(WorkContext context, string url, bool endResponse) {
-            ProxyRedirect(context, url, "ticket", endResponse);
+        public void ProxyRedirect(HttpContextBase httpContext, string url, bool endResponse) {
+            ProxyRedirect(httpContext, url, "ticket", endResponse);
         }
 
         /// <summary>
@@ -113,9 +114,10 @@ namespace NGM.CasClient.Client {
         /// that ticket included in the url.  The foreign service must be configured 
         /// to accept the ticket.
         /// </summary>
+        /// <param name="httpContext"></param>
         /// <param name="url">The foreign service to redirect to</param>
         /// <param name="proxyTicketUrlParameter">
-        /// The ticket parameter to include in the remote service Url.
+        ///     The ticket parameter to include in the remote service Url.
         /// </param>
         /// <exception cref="ArgumentNullException">
         /// The url or proxyTicketUrlParameter supplied is null
@@ -123,19 +125,20 @@ namespace NGM.CasClient.Client {
         /// <exception cref="ArgumentException">
         /// The url or proxyTicketUrlParametersupplied is empty
         /// </exception>
-        public void ProxyRedirect(WorkContext context, string url, string proxyTicketUrlParameter) {
-            ProxyRedirect(context, url, proxyTicketUrlParameter, false);
+        public void ProxyRedirect(HttpContextBase httpContext, string url, string proxyTicketUrlParameter) {
+            ProxyRedirect(httpContext, url, proxyTicketUrlParameter, false);
         }
 
         /// <summary>
         /// </summary>
+        /// <param name="httpContext"></param>
         /// <param name="url">The foreign service to redirect to</param>
         /// <param name="proxyTicketUrlParameter">
-        /// The ticket parameter to include in the remote service Url.
+        ///     The ticket parameter to include in the remote service Url.
         /// </param>
         /// <param name="endResponse">
-        /// Boolean indicating whether or not to short circuit the remaining request 
-        /// pipeline events
+        ///     Boolean indicating whether or not to short circuit the remaining request 
+        ///     pipeline events
         /// </param>
         /// <exception cref="ArgumentNullException">
         /// The url or proxyTicketUrlParameter supplied is null
@@ -143,14 +146,14 @@ namespace NGM.CasClient.Client {
         /// <exception cref="ArgumentException">
         /// The url or proxyTicketUrlParametersupplied is empty
         /// </exception>
-        public void ProxyRedirect(WorkContext context, string url, string proxyTicketUrlParameter, bool endResponse) {
+        public void ProxyRedirect(HttpContextBase httpContext, string url, string proxyTicketUrlParameter, bool endResponse) {
             Argument.ThrowIfNullOrEmpty(url, "url", "url parameter cannot be null or empty.");
             Argument.ThrowIfNull(proxyTicketUrlParameter, "proxyTicketUrlParameter", "proxyTicketUrlParameter parameter cannot be null or empty.");
 
-            HttpResponseBase response = context.HttpContext.Response;
+            HttpResponseBase response = httpContext.Response;
 
             string proxyRedirectUrl = _urlUtil.GetProxyRedirectUrl(url, proxyTicketUrlParameter, (resolvedUrl) => {
-                return GetProxyTicketIdFor(context, resolvedUrl);
+                return GetProxyTicketIdFor(httpContext, resolvedUrl);
             });
 
             response.Redirect(proxyRedirectUrl, endResponse);
@@ -168,18 +171,19 @@ namespace NGM.CasClient.Client {
         /// server does not trust the SSL certificate or the certificate authority/chain of the SSL
         /// certificate, the request will fail.
         /// </remarks>
+        /// <param name="httpContext"></param>
         /// <param name="targetServiceUrl">The target Url to obtain a proxy ticket for</param>
         /// <returns>
         /// A proxy ticket for the target Url or an empty string if the request failed.
         /// </returns>
-        public string GetProxyTicketIdFor(WorkContext context, string targetServiceUrl) {
+        public string GetProxyTicketIdFor(HttpContextBase httpContext, string targetServiceUrl) {
             Argument.ThrowIfNullOrEmpty(targetServiceUrl, "targetServiceUrl", "targetServiceUrl parameter cannot be null or empty.");
 
             if (_casServices.ServiceTicketManager == null) {
                 LogAndThrowConfigurationException("Proxy authentication requires a ServiceTicketManager");
             }
 
-            FormsAuthenticationTicket formsAuthTicket = GetFormsAuthenticationTicket(context);
+            FormsAuthenticationTicket formsAuthTicket = GetFormsAuthenticationTicket(httpContext);
 
             if (formsAuthTicket == null) {
                 LogAndThrowOperationException("The request is not authenticated (does not have a CAS Service or Proxy ticket).");
@@ -250,7 +254,7 @@ namespace NGM.CasClient.Client {
         /// </summary>
         public RedirectResult RedirectToLoginPage(bool forceRenew) {
             string redirectUrl = _urlUtil.ConstructLoginRedirectUrl(false, forceRenew);
-            Logger.Information("Redirecting to " + redirectUrl);
+            Logger.Information("Redirecting to {0}", redirectUrl);
             return new RedirectResult(redirectUrl);
         }
 
@@ -272,12 +276,12 @@ namespace NGM.CasClient.Client {
         /// Redirects the current request back to the requested page without
         /// the CAS ticket artifact in the URL.
         /// </summary>
-        public RedirectResult RedirectFromLoginCallback(WorkContext context, ActionResult result) {
-            HttpRequestBase request = context.HttpContext.Request;
-            if (_requestEvaluator.GetRequestHasGatewayParameter(context)) {
+        public RedirectResult RedirectFromLoginCallback(HttpContextBase httpContext, ActionResult result) {
+            HttpRequestBase request = httpContext.Request;
+            if (_requestEvaluator.GetRequestHasGatewayParameter(httpContext)) {
                 // TODO: Only set Success if request is authenticated?  Otherwise Failure.  
                 // Doesn't make a difference from a security perspective, but may be clearer for users
-                SetGatewayStatusCookie(context, GatewayStatus.Success);
+                SetGatewayStatusCookie(httpContext, GatewayStatus.Success);
             }
 
             return new RedirectResult(_urlUtil.RemoveCasArtifactsFromUrl(request.Url.PathAndQuery));
@@ -287,9 +291,9 @@ namespace NGM.CasClient.Client {
         /// Redirects the current request back to the requested page without
         /// the gateway callback artifact in the URL.
         /// </summary>
-        public RedirectResult RedirectFromFailedGatewayCallback(WorkContext context) {
-            HttpRequestBase request = context.HttpContext.Request;
-            SetGatewayStatusCookie(context, GatewayStatus.Failed);
+        public RedirectResult RedirectFromFailedGatewayCallback(HttpContextBase httpContext) {
+            HttpRequestBase request = httpContext.Request;
+            SetGatewayStatusCookie(httpContext, GatewayStatus.Failed);
 
             string urlWithoutCasArtifact = _urlUtil.RemoveCasArtifactsFromUrl(request.Url.AbsoluteUri);
             return new RedirectResult(urlWithoutCasArtifact);
@@ -309,17 +313,17 @@ namespace NGM.CasClient.Client {
         /// unnecessary.  This property allows you to override the behavior and 
         /// perform a redirection regardless of whether it has already been attempted.
         /// </param>
-        public RedirectResult GatewayAuthenticate(WorkContext context, bool ignoreGatewayStatusCookie) {
+        public RedirectResult GatewayAuthenticate(HttpContextBase httpContext, bool ignoreGatewayStatusCookie) {
             if (!ignoreGatewayStatusCookie) {
-                if (GetGatewayStatus(context) != GatewayStatus.NotAttempted) {
+                if (GetGatewayStatus(httpContext) != GatewayStatus.NotAttempted) {
                     return null;
                 }
             }
 
-            SetGatewayStatusCookie(context, GatewayStatus.Attempting);
+            SetGatewayStatusCookie(httpContext, GatewayStatus.Attempting);
 
             string redirectUrl = _urlUtil.ConstructLoginRedirectUrl(true, false);
-            Logger.Information("Performing gateway redirect to " + redirectUrl);
+            Logger.Information("Performing gateway redirect to {0}", redirectUrl);
             return new RedirectResult(redirectUrl);
         }
 
@@ -335,12 +339,12 @@ namespace NGM.CasClient.Client {
         /// PHP) varies based on the client implementation.  Consult the Jasig wiki
         /// for more details.
         /// </summary>
-        public void SingleSignOut(WorkContext context) {
-            HttpResponseBase response = context.HttpContext.Response;
+        public void SingleSignOut(HttpContextBase httpContext) {
+            HttpResponseBase response = httpContext.Response;
 
             // Necessary for ASP.NET MVC Support.
             if (_authenticationService.GetAuthenticatedUser() != null) {
-                ClearAuthCookie(context);
+                ClearAuthCookie(httpContext);
                 string singleSignOutRedirectUrl = _urlUtil.ConstructSingleSignOutRedirectUrl();
 
                 // Leave endResponse as true.  This will throw a handled ThreadAbortException
@@ -359,8 +363,8 @@ namespace NGM.CasClient.Client {
         /// Boolean indicating whether the request was a SingleSignOut request, regardless of
         /// whether or not the request actually required processing (non-existent/already expired).
         /// </returns>
-        public ActionResult ProcessSingleSignOutRequest(WorkContext context) {
-            HttpRequestBase request = context.HttpContext.Request;
+        public ActionResult ProcessSingleSignOutRequest(HttpContextBase httpContext) {
+            HttpRequestBase request = httpContext.Request;
 
             Logger.Debug("Examining request for single sign-out signature");
 
@@ -371,9 +375,9 @@ namespace NGM.CasClient.Client {
 
                 string casTicket = ExtractSingleSignOutTicketFromSamlResponse(request.Params["logoutRequest"]);
                 if (!String.IsNullOrEmpty(casTicket)) {
-                    Logger.Information("Processing single sign-out request for " + casTicket);
+                    Logger.Information("Processing single sign-out request for {0}", casTicket);
                     _casServices.ServiceTicketManager.RevokeTicket(casTicket);
-                    Logger.Debug("Successfully removed " + casTicket);
+                    Logger.Debug("Successfully removed {0}", casTicket);
 
                     return new HttpStatusCodeResult(HttpStatusCode.OK, "Revoked Ticket");
                 }
@@ -396,8 +400,8 @@ namespace NGM.CasClient.Client {
         /// A Boolean indicating whether or not the proxy callback request is valid and mapped to a valid,
         /// outstanding Proxy Granting Ticket IOU.
         /// </returns>
-        public ActionResult ProcessProxyCallbackRequest(WorkContext context) {
-            HttpRequestBase request = context.HttpContext.Request;
+        public ActionResult ProcessProxyCallbackRequest(HttpContextBase httpContext) {
+            HttpRequestBase request = httpContext.Request;
 
             string proxyGrantingTicketIou = request.Params[PARAM_PROXY_GRANTING_TICKET_IOU];
             string proxyGrantingTicket = request.Params[PARAM_PROXY_GRANTING_TICKET];
@@ -434,27 +438,24 @@ namespace NGM.CasClient.Client {
         /// method).  If the validation fails, the authentication status remains 
         /// unchanged (generally the user is and remains anonymous).
         /// </summary>
-        public void ProcessTicketValidation(WorkContext context) {
-            HttpApplication app = context.HttpContext.ApplicationInstance;
-            HttpRequestBase request = context.HttpContext.Request;
-
-            CasAuthenticationTicket casTicket;
-            ICasPrincipal principal;
+        public void ProcessTicketValidation(HttpContextBase httpContext) {
+            HttpApplication app = httpContext.ApplicationInstance;
+            HttpRequestBase request = httpContext.Request;
 
             string ticket = request[_casServices.Settings.ArtifactParameterName];
 
             try {
                 // Attempt to authenticate the ticket and resolve to an ICasPrincipal
-                principal = TicketValidator.Validate(ticket);
+                var principal = TicketValidator.Validate(ticket);
 
                 // Save the ticket in the FormsAuthTicket.  Encrypt the ticket and send it as a cookie. 
-                casTicket = new CasAuthenticationTicket(
+                var casTicket = new CasAuthenticationTicket(
                     ticket,
                     _urlUtil.RemoveCasArtifactsFromUrl(request.Url.AbsoluteUri),
                     request.UserHostAddress,
                     principal.Assertion,
-                    _clock
-                );
+                    _clock.UtcNow
+                    );
 
                 if (_casServices.ProxyTicketManager != null && !string.IsNullOrEmpty(principal.ProxyGrantingTicket)) {
                     casTicket.ProxyGrantingTicketIou = principal.ProxyGrantingTicket;
@@ -473,11 +474,11 @@ namespace NGM.CasClient.Client {
                     null, 
                     null);
 
-                SetAuthCookie(context, formsAuthTicket);
+                SetAuthCookie(httpContext, formsAuthTicket);
 
                 // Also save the ticket in the server store (if configured)
                 if (_casServices.ServiceTicketManager != null) {
-                    _casServices.ServiceTicketManager.UpdateTicketExpiration(casTicket, GetFormsAuthenticationTicket(context).Expiration);
+                    _casServices.ServiceTicketManager.UpdateTicketExpiration(casTicket, formsAuthTicket.Expiration);
                 }
 
                 // Jump directly to EndRequest.  Don't allow the Page and/or Handler to execute.
@@ -487,7 +488,7 @@ namespace NGM.CasClient.Client {
             }
             catch (TicketValidationException e) {
                 // Leave principal null.  This might not have been a CAS service ticket.
-                Logger.Error("Ticket validation error: " + e);
+                Logger.Error(e, "Ticket validation error: {0}", e);
             }
         }
 
@@ -501,10 +502,10 @@ namespace NGM.CasClient.Client {
         /// are set with a ICasPrincipal and the current request is considered 
         /// authenticated.  Otherwise, the current request is effectively anonymous.
         /// </summary>
-        public void ProcessRequestAuthentication(WorkContext context) {
+        public void ProcessRequestAuthentication(HttpContextBase httpContext) {
             // Look for a valid FormsAuthenticationTicket encrypted in a cookie.
             CasAuthenticationTicket casTicket = null;
-            FormsAuthenticationTicket formsAuthenticationTicket = GetFormsAuthenticationTicket(context);
+            FormsAuthenticationTicket formsAuthenticationTicket = GetFormsAuthenticationTicket(httpContext);
             if (formsAuthenticationTicket != null) {
                 ICasPrincipal principal;
                 if (_casServices.ServiceTicketManager != null) {
@@ -514,10 +515,10 @@ namespace NGM.CasClient.Client {
                         IAssertion assertion = casTicket.Assertion;
 
                         if (!_casServices.ServiceTicketManager.VerifyClientTicket(casTicket)) {
-                            Logger.Warning("CasAuthenticationTicket failed verification: " + casTicket);
+                            Logger.Warning("CasAuthenticationTicket failed verification: {0}", casTicket);
 
                             // Deletes the invalid FormsAuthentication cookie from the client.
-                            ClearAuthCookie(context);
+                            ClearAuthCookie(httpContext);
                             _casServices.ServiceTicketManager.RevokeTicket(serviceTicket);
 
                             // Don't give this request a User/Principal.  Remove it if it was created
@@ -525,7 +526,10 @@ namespace NGM.CasClient.Client {
                             principal = null;
                         }
                         else {
-                            if (_casServices.ProxyTicketManager != null && !string.IsNullOrEmpty(casTicket.ProxyGrantingTicketIou) && string.IsNullOrEmpty(casTicket.ProxyGrantingTicket)) {
+                            if (_casServices.ProxyTicketManager != null && 
+                                !string.IsNullOrEmpty(casTicket.ProxyGrantingTicketIou) && 
+                                string.IsNullOrEmpty(casTicket.ProxyGrantingTicket)) {
+
                                 string proxyGrantingTicket = _casServices.ProxyTicketManager.GetProxyGrantingTicket(casTicket.ProxyGrantingTicketIou);
                                 if (!string.IsNullOrEmpty(proxyGrantingTicket)) {
                                     casTicket.ProxyGrantingTicket = proxyGrantingTicket;
@@ -536,15 +540,15 @@ namespace NGM.CasClient.Client {
                         }
                     }
                     else {
-                        if (context.HttpContext.User != null &&
-                            context.HttpContext.User.Identity is FormsIdentity &&
+                        if (httpContext.User != null &&
+                            httpContext.User.Identity is FormsIdentity &&
                             _authenticationService.GetAuthenticatedUser() != null) {
                             return;
                         }
 
                         // This didn't resolve to a ticket in the TicketStore.  Revoke it.
-                        ClearAuthCookie(context);
-                        Logger.Debug("Revoking ticket " + serviceTicket);
+                        ClearAuthCookie(httpContext);
+                        Logger.Debug("Revoking ticket {0}", serviceTicket);
                         _casServices.ServiceTicketManager.RevokeTicket(serviceTicket);
 
                         // Don't give this request a User/Principal.  Remove it if it was created
@@ -556,19 +560,19 @@ namespace NGM.CasClient.Client {
                     principal = new CasPrincipal(new Assertion(formsAuthenticationTicket.Name));
                 }
 
-                context.HttpContext.User = principal;
+                httpContext.User = principal;
                 Thread.CurrentPrincipal = principal;
 
                 if (principal == null) {
                     // Remove the cookie from the client
-                    ClearAuthCookie(context);
+                    ClearAuthCookie(httpContext);
                 }
                 else {
                     // Extend the expiration of the cookie if FormsAuthentication is configured to do so.
                     if (FormsAuthentication.SlidingExpiration) {
                         FormsAuthenticationTicket newTicket = FormsAuthentication.RenewTicketIfOld(formsAuthenticationTicket);
                         if (newTicket != null && newTicket != formsAuthenticationTicket) {
-                            SetAuthCookie(context, newTicket);
+                            SetAuthCookie(httpContext, newTicket);
                             if (_casServices.ServiceTicketManager != null) {
                                 _casServices.ServiceTicketManager.UpdateTicketExpiration(casTicket, newTicket.Expiration);
                             }
@@ -588,9 +592,9 @@ namespace NGM.CasClient.Client {
         /// 'cookiesRequiredUrl' is not defined but 'gateway' is, every page request
         /// will result in a round-trip to the CAS server.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="httpContext"></param>
         /// <param name="gatewayStatus">The GatewayStatus to attempt to store</param>
-        public void SetGatewayStatusCookie(WorkContext context, GatewayStatus gatewayStatus) {
+        public void SetGatewayStatusCookie(HttpContextBase httpContext, GatewayStatus gatewayStatus) {
             var cookie = new HttpCookie(_casServices.Settings.GatewayStatusCookieName, gatewayStatus.ToString()) {
                 HttpOnly = false,
                 Secure = false,
@@ -598,7 +602,7 @@ namespace NGM.CasClient.Client {
             };
 
             if (!String.IsNullOrEmpty(_settings.RequestUrlPrefix)) {
-                cookie.Path = GetCookiePath(context);
+                cookie.Path = GetCookiePath(httpContext);
             }
 
             if (FormsAuthentication.CookieDomain != null) {
@@ -606,11 +610,11 @@ namespace NGM.CasClient.Client {
             }
 
             // Add it to the request collection for later processing during this request
-            context.HttpContext.Request.Cookies.Remove(_casServices.Settings.GatewayStatusCookieName);
-            context.HttpContext.Request.Cookies.Add(cookie);
+            httpContext.Request.Cookies.Remove(_casServices.Settings.GatewayStatusCookieName);
+            httpContext.Request.Cookies.Add(cookie);
 
             // Add it to the response collection for delivery to client
-            context.HttpContext.Response.Cookies.Add(cookie);
+            httpContext.Response.Cookies.Add(cookie);
         }
 
         /// <summary>
@@ -620,8 +624,8 @@ namespace NGM.CasClient.Client {
         /// The GatewayStatus stored in the cookie if present, otherwise 
         /// GatewayStatus.NotAttempted.
         /// </returns>
-        public GatewayStatus GetGatewayStatus(WorkContext context) {
-            HttpCookie cookie = context.HttpContext.Request.Cookies[_casServices.Settings.GatewayStatusCookieName];
+        public GatewayStatus GetGatewayStatus(HttpContextBase httpContext) {
+            HttpCookie cookie = httpContext.Request.Cookies[_casServices.Settings.GatewayStatusCookieName];
 
             GatewayStatus status;
 
@@ -633,7 +637,7 @@ namespace NGM.CasClient.Client {
                 catch (ArgumentException) {
                     // If the cookie contains an invalid value, clear the cookie 
                     // and return GatewayStatus.NotAttempted
-                    SetGatewayStatusCookie(context, GatewayStatus.NotAttempted);
+                    SetGatewayStatusCookie(httpContext, GatewayStatus.NotAttempted);
                     status = GatewayStatus.NotAttempted;
                 }
             }
@@ -653,9 +657,9 @@ namespace NGM.CasClient.Client {
         /// code from being able to access it during the execution of the 
         /// current request.
         /// </summary>
-        public void ClearAuthCookie(WorkContext context) {
+        public void ClearAuthCookie(HttpContextBase httpContext) {
             // Don't let anything see the incoming cookie 
-            context.HttpContext.Request.Cookies.Remove(FormsAuthentication.FormsCookieName);
+            httpContext.Request.Cookies.Remove(FormsAuthentication.FormsCookieName);
 
             // Signout of Orchard too... Clearing the cookie might leave state that is unacceptable.
             _authenticationService.SignOut();
@@ -667,22 +671,22 @@ namespace NGM.CasClient.Client {
         /// </summary>
         /// <param name="httpContext"></param>
         /// <param name="clientTicket">The FormsAuthenticationTicket to encode</param>
-        public void SetAuthCookie(WorkContext httpContext, FormsAuthenticationTicket clientTicket) {
-            if (!httpContext.HttpContext.Request.IsSecureConnection && FormsAuthentication.RequireSSL) {
+        public void SetAuthCookie(HttpContextBase httpContext, FormsAuthenticationTicket clientTicket) {
+            if (!httpContext.Request.IsSecureConnection && FormsAuthentication.RequireSSL) {
                 throw new HttpException("Connection not secure while creating secure cookie");
             }
 
-            httpContext.HttpContext.Response.Cookies.Add(GetAuthCookie(httpContext, clientTicket));
+            httpContext.Response.Cookies.Add(GetAuthCookie(httpContext, clientTicket));
         }
 
         /// <summary>
         /// Creates an HttpCookie containing an encrypted FormsAuthenticationTicket,
         /// which in turn contains a CAS service ticket.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="httpContext"></param>
         /// <param name="ticket">The FormsAuthenticationTicket to encode</param>
         /// <returns>An HttpCookie containing the encrypted FormsAuthenticationTicket</returns>
-        public HttpCookie GetAuthCookie(WorkContext context, FormsAuthenticationTicket ticket) {
+        public HttpCookie GetAuthCookie(HttpContextBase httpContext, FormsAuthenticationTicket ticket) {
             string str = FormsAuthentication.Encrypt(ticket);
 
             if (String.IsNullOrEmpty(str)) {
@@ -696,7 +700,7 @@ namespace NGM.CasClient.Client {
             };
 
             if (!String.IsNullOrEmpty(_settings.RequestUrlPrefix)) {
-                cookie.Path = GetCookiePath(context);
+                cookie.Path = GetCookiePath(httpContext);
             }
 
             if (FormsAuthentication.CookieDomain != null) {
@@ -722,24 +726,24 @@ namespace NGM.CasClient.Client {
         /// <param name="validUntilDate">Ticket valid too date</param>
         /// <returns>Instance of a FormsAuthenticationTicket</returns>
         public FormsAuthenticationTicket CreateFormsAuthenticationTicket(
-            string netId, 
-            string serviceTicket, 
-            DateTime? validFromDate, 
+            string netId,
+            string serviceTicket,
+            DateTime? validFromDate,
             DateTime? validUntilDate) {
 
-            Logger.Debug("Creating FormsAuthenticationTicket for " + serviceTicket);
+            Logger.Debug("Creating FormsAuthenticationTicket for {0}", serviceTicket);
 
             DateTime fromDate = validFromDate.HasValue ? validFromDate.Value : _clock.UtcNow;
             DateTime toDate = validUntilDate.HasValue ? validUntilDate.Value : fromDate.Add(TimeSpan.FromDays(30));
 
             var ticket = new FormsAuthenticationTicket(
-                            2 /*version*/,
-                            netId,
-                            fromDate,
-                            toDate,
-                            false,
-                            serviceTicket,
-                            FormsAuthentication.FormsCookiePath);
+                2 /*version*/,
+                netId,
+                fromDate,
+                toDate,
+                false,
+                serviceTicket,
+                FormsAuthentication.FormsCookiePath);
 
             return ticket;
         }
@@ -754,48 +758,36 @@ namespace NGM.CasClient.Client {
         /// Returns the FormsAuthenticationTicket contained in the 
         /// cookie or null if any issues are encountered.
         /// </returns>
-        public FormsAuthenticationTicket GetFormsAuthenticationTicket(WorkContext context) {
-            HttpCookie cookie = context.HttpContext.Request.Cookies[FormsAuthentication.FormsCookieName];
+        public FormsAuthenticationTicket GetFormsAuthenticationTicket(HttpContextBase httpContext) {
+            HttpCookie cookie = httpContext.Request.Cookies[FormsAuthentication.FormsCookieName];
 
             if (cookie == null) {
                 return null;
             }
 
-            if (cookie.Expires != DateTime.MinValue && cookie.Expires < _clock.UtcNow) {
-                ClearAuthCookie(context);
+            if ((cookie.Expires != DateTime.MinValue && cookie.Expires < _clock.UtcNow) ||
+                String.IsNullOrEmpty(cookie.Value)) {
+                ClearAuthCookie(httpContext);
                 return null;
             }
 
-            if (String.IsNullOrEmpty(cookie.Value)) {
-                ClearAuthCookie(context);
-                return null;
-            }
-
-            FormsAuthenticationTicket formsAuthTicket;
             try {
-                formsAuthTicket = FormsAuthentication.Decrypt(cookie.Value);
+                var formsAuthTicket = FormsAuthentication.Decrypt(cookie.Value);
+
+                if (formsAuthTicket == null ||
+                    formsAuthTicket.Expired ||
+                    String.IsNullOrEmpty(formsAuthTicket.UserData)) {
+                    ClearAuthCookie(httpContext);
+                    return null;
+                }
+
+                return formsAuthTicket;
             }
             catch {
-                ClearAuthCookie(context);
-                return null;
+                ClearAuthCookie(httpContext);
             }
 
-            if (formsAuthTicket == null) {
-                ClearAuthCookie(context);
-                return null;
-            }
-
-            if (formsAuthTicket.Expired) {
-                ClearAuthCookie(context);
-                return null;
-            }
-
-            if (String.IsNullOrEmpty(formsAuthTicket.UserData)) {
-                ClearAuthCookie(context);
-                return null;
-            }
-
-            return formsAuthTicket;
+            return null;
         }
 
         /// <summary>
@@ -833,8 +825,8 @@ namespace NGM.CasClient.Client {
             throw new InvalidOperationException(message);
         }
 
-        private string GetCookiePath(WorkContext httpContext) {
-            var cookiePath = httpContext.HttpContext.Request.ApplicationPath;
+        private string GetCookiePath(HttpContextBase httpContext) {
+            var cookiePath = httpContext.Request.ApplicationPath;
             if (cookiePath != null && cookiePath.Length > 1) {
                 cookiePath += '/';
             }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 using NGM.CasClient.Client.Security;
 using Orchard.Logging;
+using Orchard.Services;
 
 namespace NGM.CasClient.Client.Validation {
     /// <summary>
@@ -11,6 +12,7 @@ namespace NGM.CasClient.Client.Validation {
     /// </summary>
     class CasSaml11Response {
         private readonly ILogger _logger;
+        private readonly IClock _clock;
 
         #region Fields
         // The SAML 1.1 Assertion namespace
@@ -50,8 +52,10 @@ namespace NGM.CasClient.Client.Validation {
         /// Assertion valid times.
         /// </param>
         /// <param name="logger"></param>
-        public CasSaml11Response(string response, long tolerance, ILogger logger) {
+        /// <param name="clock"></param>
+        public CasSaml11Response(string response, long tolerance, ILogger logger, IClock clock) {
             _logger = logger;
+            _clock = clock;
 
             _toleranceTicks = tolerance * TimeSpan.TicksPerMillisecond;
             HasCasSamlAssertion = false;
@@ -91,6 +95,8 @@ namespace NGM.CasClient.Client.Validation {
                 throw new TicketValidationException("No assertions found.");
             }
 
+            var currentTicks = _clock.UtcNow.Ticks;
+
             foreach (XmlNode assertionNode in assertions) {
                 XmlNode conditionsNode = assertionNode.SelectSingleNode("descendant::assertion:Conditions", nsmgr);
                 if (conditionsNode == null) {
@@ -102,7 +108,7 @@ namespace NGM.CasClient.Client.Validation {
                 try {
                     notBefore = SamlUtils.GetAttributeValueAsDateTime(conditionsNode, "NotBefore");
                     notOnOrAfter = SamlUtils.GetAttributeValueAsDateTime(conditionsNode, "NotOnOrAfter");
-                    if (!SamlUtils.IsValidAssertion(_logger, notBefore, notOnOrAfter, _toleranceTicks)) {
+                    if (!SamlUtils.IsValidAssertion(_logger, notBefore, notOnOrAfter, currentTicks, _toleranceTicks)) {
                         continue;
                     }
                 }

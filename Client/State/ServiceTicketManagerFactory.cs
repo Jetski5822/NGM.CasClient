@@ -36,7 +36,7 @@ namespace NGM.CasClient.Client.State {
                 return wrapper;
             }
 
-            Logger.Error("Unknown service ticket manager provider: " + name);
+            Logger.Error("Unknown service ticket manager provider: {0}", name);
             throw new CasConfigurationException("Unknown service ticket manager provider: " + name);
         }
     }

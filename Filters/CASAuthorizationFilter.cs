@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Mvc;
 using JetBrains.Annotations;
@@ -11,7 +12,6 @@ using Orchard;
 using Orchard.Localization;
 using Orchard.Logging;
 using Orchard.Mvc.Filters;
-using Orchard.WebApi.Filters;
 
 namespace NGM.CasClient.Filters {
     [UsedImplicitly]
@@ -39,10 +39,10 @@ namespace NGM.CasClient.Filters {
                 Logger.Debug("CAS is not configured correctly");
                 return;
             }
-
+            
             var workContext = filterContext.RequestContext.GetWorkContext();
 
-            ProcessAuthorization(workContext);
+            ProcessAuthorization(workContext.HttpContext);
         }
 
         public bool AllowMultiple {
@@ -54,25 +54,25 @@ namespace NGM.CasClient.Filters {
 
                 var workContext = actionContext.ControllerContext.GetWorkContext();
 
-                ProcessAuthorization(workContext);
+                ProcessAuthorization(workContext.HttpContext);
 
                 return continuation();
         }
 
-        private void ProcessAuthorization(WorkContext workContext) {
-            if (!_requestEvaluator.GetRequestIsAppropriateForCasAuthentication(workContext)) {
-                Logger.Debug("No EndRequest processing for " + workContext.HttpContext.Request.RawUrl);
+        private void ProcessAuthorization(HttpContextBase httpContext) {
+            if (!_requestEvaluator.GetRequestIsAppropriateForCasAuthentication(httpContext)) {
+                Logger.Debug("No EndRequest processing for {0}", httpContext.Request.RawUrl);
                 return;
             }
 
-            if (_requestEvaluator.GetRequestHasCasTicket(workContext)) {
+            if (_requestEvaluator.GetRequestHasCasTicket(httpContext)) {
                 Logger.Information("Processing Proxy Callback request");
-                _casClient.ProcessTicketValidation(workContext);
+                _casClient.ProcessTicketValidation(httpContext);
             }
 
-            Logger.Debug("Starting AuthenticateRequest for " + workContext.HttpContext.Request.RawUrl);
-            _casClient.ProcessRequestAuthentication(workContext);
-            Logger.Debug("Ending AuthenticateRequest for " + workContext.HttpContext.Request.RawUrl);
+            Logger.Debug("Starting AuthenticateRequest for {0}", httpContext.Request.RawUrl);
+            _casClient.ProcessRequestAuthentication(httpContext);
+            Logger.Debug("Ending AuthenticateRequest for {0}", httpContext.Request.RawUrl);
         }
     }
 }

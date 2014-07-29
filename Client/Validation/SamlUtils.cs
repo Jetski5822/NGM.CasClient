@@ -28,7 +28,7 @@ namespace NGM.CasClient.Client.Validation {
         /// true if this Assertion is valid relative to the current time; otherwise
         /// returns false
         /// </returns>
-        public static bool IsValidAssertion(ILogger logger, DateTime notBefore, DateTime notOnOrAfter, long toleranceTicks) {
+        public static bool IsValidAssertion(ILogger logger, DateTime notBefore, DateTime notOnOrAfter, long currentTicks, long toleranceTicks) {
             if (notBefore == DateTime.MinValue || notOnOrAfter == DateTime.MinValue) {
                 logger.Debug("Assertion has no bounding dates.  Will not process.");
                 return false;
@@ -36,7 +36,7 @@ namespace NGM.CasClient.Client.Validation {
             logger.Debug("Assertion validity window: {0} - {1} +/- {2}ms", notBefore, notOnOrAfter, toleranceTicks / 10000);
 
             //TODO: (ngm) Need to use Orchard Clock implementation
-            long utcNowTicks = DateTime.UtcNow.Ticks;
+            long utcNowTicks = currentTicks;
             if (utcNowTicks + toleranceTicks < notBefore.Ticks) {
                 logger.Debug("Assertion is not yet valid.");
                 return false;

@@ -62,7 +62,7 @@ namespace NGM.CasClient.Client.State {
 
             string key = GetTicketKey(serviceTicket);
             if (context.Cache[key] != null) {
-                CasAuthenticationTicket result = context.Cache[key] as CasAuthenticationTicket;
+                var result = context.Cache[key] as CasAuthenticationTicket;
                 return result;
             }
             return null;
@@ -113,7 +113,7 @@ namespace NGM.CasClient.Client.State {
 
             string key = GetTicketKey(serviceTicket);
             if (context.Cache[key] != null) {
-                CasAuthenticationTicket ticket = context.Cache[key] as CasAuthenticationTicket;
+                var ticket = context.Cache[key] as CasAuthenticationTicket;
                 if (ticket != null) {
                     if (context.Cache[key] != null) {
                         context.Cache.Remove(key);
@@ -134,9 +134,9 @@ namespace NGM.CasClient.Client.State {
 
             IDictionaryEnumerator enumerator = _httpContextAccessor.Current().Cache.GetEnumerator();
             while (enumerator.MoveNext()) {
-                string currentKey = enumerator.Entry.Key as string;
+                var currentKey = enumerator.Entry.Key as string;
                 if (currentKey != null && currentKey.StartsWith(CACHE_TICKET_KEY_PREFIX)) {
-                    CasAuthenticationTicket currentAuthTicket = enumerator.Entry.Value as CasAuthenticationTicket;
+                    var currentAuthTicket = enumerator.Entry.Value as CasAuthenticationTicket;
                     if (currentAuthTicket != null) {
                         if (currentAuthTicket.ServiceTicket == serviceTicket) {
                             return true;
@@ -158,7 +158,7 @@ namespace NGM.CasClient.Client.State {
 
             IEnumerable<CasAuthenticationTicket> allTickets = GetAllTickets();
             foreach (CasAuthenticationTicket ticket in allTickets) {
-                if (String.Compare(ticket.NetId, netId, true) == 0) {
+                if (String.Compare(ticket.NetId, netId, System.StringComparison.OrdinalIgnoreCase) == 0) {
                     RevokeTicket(ticket.ServiceTicket);
                 }
             }
@@ -171,9 +171,9 @@ namespace NGM.CasClient.Client.State {
         public IEnumerable<CasAuthenticationTicket> GetAllTickets() {
             IDictionaryEnumerator enumerator = _httpContextAccessor.Current().Cache.GetEnumerator();
             while (enumerator.MoveNext()) {
-                string currentKey = enumerator.Entry.Key as string;
+                var currentKey = enumerator.Entry.Key as string;
                 if (currentKey != null && currentKey.StartsWith(CACHE_TICKET_KEY_PREFIX)) {
-                    CasAuthenticationTicket currentTicket = enumerator.Entry.Value as CasAuthenticationTicket;
+                    var currentTicket = enumerator.Entry.Value as CasAuthenticationTicket;
                     if (currentTicket != null) {
                         yield return currentTicket;
                     }
@@ -194,10 +194,10 @@ namespace NGM.CasClient.Client.State {
 
             IDictionaryEnumerator enumerator = _httpContextAccessor.Current().Cache.GetEnumerator();
             while (enumerator.MoveNext()) {
-                string currentKey = enumerator.Entry.Key as string;
+                var currentKey = enumerator.Entry.Key as string;
                 if (currentKey != null && currentKey.StartsWith(CACHE_TICKET_KEY_PREFIX)) {
-                    CasAuthenticationTicket currentTicket = enumerator.Entry.Value as CasAuthenticationTicket;
-                    if (currentTicket != null && String.Compare(currentTicket.NetId, netId, true) == 0) {
+                    var currentTicket = enumerator.Entry.Value as CasAuthenticationTicket;
+                    if (currentTicket != null && String.Compare(currentTicket.NetId, netId, System.StringComparison.OrdinalIgnoreCase) == 0) {
                         yield return currentTicket;
                     }
                 }
@@ -212,9 +212,9 @@ namespace NGM.CasClient.Client.State {
         public IEnumerable<string> GetAllServiceTickets() {
             IDictionaryEnumerator enumerator = _httpContextAccessor.Current().Cache.GetEnumerator();
             while (enumerator.MoveNext()) {
-                string currentKey = enumerator.Entry.Key as string;
+                var currentKey = enumerator.Entry.Key as string;
                 if (currentKey != null && currentKey.StartsWith(CACHE_TICKET_KEY_PREFIX)) {
-                    CasAuthenticationTicket currentAuthTicket = enumerator.Entry.Value as CasAuthenticationTicket;
+                    var currentAuthTicket = enumerator.Entry.Value as CasAuthenticationTicket;
                     if (currentAuthTicket != null) {
                         yield return currentAuthTicket.ServiceTicket;
                     }
@@ -235,10 +235,10 @@ namespace NGM.CasClient.Client.State {
 
             IDictionaryEnumerator enumerator = _httpContextAccessor.Current().Cache.GetEnumerator();
             while (enumerator.MoveNext()) {
-                string currentKey = enumerator.Entry.Key as string;
+                var currentKey = enumerator.Entry.Key as string;
                 if (currentKey != null && currentKey.StartsWith(CACHE_TICKET_KEY_PREFIX)) {
-                    CasAuthenticationTicket currentAuthTicket = enumerator.Entry.Value as CasAuthenticationTicket;
-                    if (currentAuthTicket != null && String.Compare(currentAuthTicket.NetId, netId, true) == 0) {
+                    var currentAuthTicket = enumerator.Entry.Value as CasAuthenticationTicket;
+                    if (currentAuthTicket != null && String.Compare(currentAuthTicket.NetId, netId, System.StringComparison.OrdinalIgnoreCase) == 0) {
                         yield return currentAuthTicket.ServiceTicket;
                     }
                 }
@@ -277,13 +277,13 @@ namespace NGM.CasClient.Client.State {
             if (cacheAuthTicket != null) {
                 string cacheServiceTicket = cacheAuthTicket.ServiceTicket;
                 if (cacheServiceTicket == incomingServiceTicket) {
-                    if (String.Compare(cacheAuthTicket.NetId, casAuthenticationTicket.NetId, true) != 0) {
+                    if (String.Compare(cacheAuthTicket.NetId, casAuthenticationTicket.NetId, System.StringComparison.OrdinalIgnoreCase) != 0) {
                         Logger.Information("Username {0} in ticket {1} does not match cached value.",
                             casAuthenticationTicket.NetId, incomingServiceTicket);
                         return false;
                     }
 
-                    if (String.Compare(cacheAuthTicket.Assertion.PrincipalName, casAuthenticationTicket.Assertion.PrincipalName, true) != 0) {
+                    if (String.Compare(cacheAuthTicket.Assertion.PrincipalName, casAuthenticationTicket.Assertion.PrincipalName, System.StringComparison.OrdinalIgnoreCase) != 0) {
                         Logger.Information("Principal name {0} in assertion of ticket {1} does not match cached value.",
                             casAuthenticationTicket.NetId, casAuthenticationTicket.Assertion.PrincipalName);
                         return false;
@@ -314,9 +314,9 @@ namespace NGM.CasClient.Client.State {
         /// <exception cref="ArgumentNullException">serviceTicket is null</exception>
         /// <exception cref="ArgumentException">serviceTicket is empty</exception>
         private static string GetTicketKey(string serviceTicket) {
-            Argument.ThrowIfNullOrEmpty(serviceTicket, "serviceTicket parameter cannot be null or empty.");
+            Argument.ThrowIfNullOrEmpty(serviceTicket, "serviceTicket", "serviceTicket parameter cannot be null or empty.");
 
-            return CACHE_TICKET_KEY_PREFIX + serviceTicket;
+            return string.Format("{0},{1}", CACHE_TICKET_KEY_PREFIX, serviceTicket);
         }
 
         public string Name {

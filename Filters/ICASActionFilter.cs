@@ -38,48 +38,52 @@ namespace NGM.CasClient.Filters {
         public Localizer T { get; set; }
 
         public ActionResult OnActionExecuting(WorkContext workContext) {
+            var httpContext = workContext.HttpContext;
+
             _serviceTicketManagerWrapper.RemoveExpiredTickets();
             _proxyTicketManagerWrapper.RemoveExpiredMappings();
 
-            if (_casServices.Settings.ProcessIncomingSingleSignOutRequests && _requestEvaluator.GetRequestIsCasSingleSignOut(workContext)) {
+            if (_casServices.Settings.ProcessIncomingSingleSignOutRequests && _requestEvaluator.GetRequestIsCasSingleSignOut(httpContext)) {
                 Logger.Information("Processing inbound Single Sign Out request.");
-                return _casClient.ProcessSingleSignOutRequest(workContext);
+                return _casClient.ProcessSingleSignOutRequest(httpContext);
             }
-            if (_requestEvaluator.GetRequestIsProxyResponse(workContext)) {
+            if (_requestEvaluator.GetRequestIsProxyResponse(httpContext)) {
                 Logger.Information("Processing Proxy Callback request");
-                return _casClient.ProcessProxyCallbackRequest(workContext);
+                return _casClient.ProcessProxyCallbackRequest(httpContext);
             }
             return null;
         }
 
         public ActionResult OnActionExecuted(WorkContext workContext) {
-            if (_requestEvaluator.GetRequestRequiresGateway(workContext, _casClient.GetGatewayStatus(workContext))) {
+            var httpContext = workContext.HttpContext;
+
+            if (_requestEvaluator.GetRequestRequiresGateway(httpContext, _casClient.GetGatewayStatus(httpContext))) {
                 Logger.Information("  Performing Gateway Authentication");
-                return _casClient.GatewayAuthenticate(workContext, true);
+                return _casClient.GatewayAuthenticate(httpContext, true);
             }
-            if (_requestEvaluator.GetUserDoesNotAllowSessionCookies(workContext, _casClient.GetGatewayStatus(workContext))) {
+            if (_requestEvaluator.GetUserDoesNotAllowSessionCookies(httpContext, _casClient.GetGatewayStatus(httpContext))) {
                 Logger.Information("  Cookies not supported.  Redirecting to Cookies Required Page");
                 return _casClient.RedirectToCookiesRequiredPage();
             }
-            if (_requestEvaluator.GetRequestHasCasTicket(workContext)) {
+            if (_requestEvaluator.GetRequestHasCasTicket(httpContext)) {
                 Logger.Information("  Redirecting from login callback");
                 //redirectRequest = _casClient.RedirectFromLoginCallback(context, filterContext.Result);
             }
-            else if (_requestEvaluator.GetRequestHasGatewayParameter(workContext)) {
+            else if (_requestEvaluator.GetRequestHasGatewayParameter(httpContext)) {
                 Logger.Information("  Redirecting from failed gateway callback");
-                return _casClient.RedirectFromFailedGatewayCallback(workContext);
+                return _casClient.RedirectFromFailedGatewayCallback(httpContext);
             }
-            else if (_requestEvaluator.GetRequestIsUnauthorized(workContext) &&
+            else if (_requestEvaluator.GetRequestIsUnauthorized(httpContext) &&
                      !String.IsNullOrEmpty(_casServices.Settings.NotAuthorizedUrl)) {
 
                 Logger.Information("  Redirecting to Unauthorized Page");
                 return _casClient.RedirectToNotAuthorizedPage();
             }
-            else if (_requestEvaluator.GetRequestIsUnauthorized(workContext)) {
+            else if (_requestEvaluator.GetRequestIsUnauthorized(httpContext)) {
                 Logger.Information("  Redirecting to CAS Login Page (Unauthorized without NotAuthorizedUrl defined)");
                 return _casClient.RedirectToLoginPage(true);
             }
-            else if (_requestEvaluator.GetRequestIsUnAuthenticated(workContext)) {
+            else if (_requestEvaluator.GetRequestIsUnAuthenticated(httpContext)) {
                 Logger.Information("  Redirecting to CAS Login Page");
                 return _casClient.RedirectToLoginPage();
             }

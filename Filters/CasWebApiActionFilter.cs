@@ -34,12 +34,13 @@ namespace NGM.CasClient.Filters {
             }
 
             var workContext = actionContext.ControllerContext.GetWorkContext();
+            var httpContext = workContext.HttpContext;
 
-            Logger.Debug("Starting BeginRequest for " + workContext.HttpContext.Request.RawUrl);
+            Logger.Debug("Starting BeginRequest for {0}", httpContext.Request.RawUrl);
             
             _casActionFilter.OnActionExecuting(workContext);
 
-            Logger.Debug("Ending BeginRequest for " + workContext.HttpContext.Request.RawUrl);
+            Logger.Debug("Ending BeginRequest for {0}", httpContext.Request.RawUrl);
         }
 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext) {
@@ -47,19 +48,20 @@ namespace NGM.CasClient.Filters {
                 Logger.Debug("CAS is not configured correctly");
                 return;
             }
-
+            
             var workContext = actionExecutedContext.ActionContext.ControllerContext.GetWorkContext();
+            var httpContext = workContext.HttpContext;
 
-            if (!_requestEvaluator.GetRequestIsAppropriateForCasAuthentication(workContext)) {
-                Logger.Debug("No EndRequest processing for " + workContext.HttpContext.Request.RawUrl);
+            if (!_requestEvaluator.GetRequestIsAppropriateForCasAuthentication(httpContext)) {
+                Logger.Debug("No EndRequest processing for {0}", httpContext.Request.RawUrl);
                 return;
             }
 
-            Logger.Debug("Starting EndRequest for " + workContext.HttpContext.Request.RawUrl);
+            Logger.Debug("Starting EndRequest for {0}", httpContext.Request.RawUrl);
 
             _casActionFilter.OnActionExecuted(workContext);
 
-            Logger.Debug("Ending EndRequest for " + workContext.HttpContext.Request.RawUrl);
+            Logger.Debug("Ending EndRequest for {0}", httpContext.Request.RawUrl);
         }
     }
 }

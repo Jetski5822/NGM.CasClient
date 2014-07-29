@@ -83,10 +83,11 @@ namespace NGM.CasClient.Client.Validation.TicketValidator {
             }
 
             // parse Assertion element out of SAML response from CAS
-            CasSaml11Response casSaml11Response = new CasSaml11Response(response, CASServices.Settings.TicketTimeTolerance, CASServices.Logger);
+            CasSaml11Response casSaml11Response = 
+                new CasSaml11Response(response, CASServices.Settings.TicketTimeTolerance, CASServices.Logger, CASServices.Clock);
 
             if (casSaml11Response.HasCasSamlAssertion) {
-                CASServices.Logger.Debug("Valid Assertion found: " + casSaml11Response.CasPrincipal.Assertion);
+                CASServices.Logger.Debug("Valid Assertion found: {0}", casSaml11Response.CasPrincipal.Assertion);
                 return casSaml11Response.CasPrincipal;
             }
             else {
