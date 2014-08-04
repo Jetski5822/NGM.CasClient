@@ -676,7 +676,10 @@ namespace NGM.CasClient.Client {
                 throw new HttpException("Connection not secure while creating secure cookie");
             }
 
-            httpContext.Response.Cookies.Add(GetAuthCookie(httpContext, clientTicket));
+            var authCookie = GetAuthCookie(httpContext, clientTicket);
+
+            httpContext.Request.Cookies.Add(authCookie);
+            httpContext.Response.Cookies.Add(authCookie);
         }
 
         /// <summary>
