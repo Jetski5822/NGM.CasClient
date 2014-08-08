@@ -678,6 +678,7 @@ namespace NGM.CasClient.Client {
 
             var authCookie = GetAuthCookie(httpContext, clientTicket);
 
+            httpContext.Request.Cookies.Remove(FormsAuthentication.FormsCookieName);
             httpContext.Request.Cookies.Add(authCookie);
             httpContext.Response.Cookies.Add(authCookie);
         }
