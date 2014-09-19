@@ -87,6 +87,7 @@
     <Compile Include="Filters\IHttpAuthorizationFilter.cs" />
     <Compile Include="Filters\WebApi\WebApiActionFilter.cs" />
     <Compile Include="MissingSettingsBanner.cs" />
+    <Compile Include="Services\DefaultCasIdentityRetriever.cs" />
     <Compile Include="Services\FormsAuthenticationService.cs" />
     <Compile Include="Client\State\CacheProxyTicketManager.cs" />
     <Compile Include="Client\State\CacheServiceTicketManager.cs" />
@@ -268,6 +269,7 @@
     <Compile Include="Migrations.cs" />
     <Compile Include="Models\CASSettingsPart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ICasIdentityRetriever.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\EditorTemplates\Parts\CASClient.CASSettings.cshtml" />
