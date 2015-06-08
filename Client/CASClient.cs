@@ -31,16 +31,16 @@ namespace NGM.CasClient.Client {
         #endregion
 
         // XML Reader Settings for SAML parsing.
-        private static readonly XmlReaderSettings xmlReaderSettings = new XmlReaderSettings {
+        private static readonly XmlReaderSettings XmlReaderSettings = new XmlReaderSettings {
             ConformanceLevel = ConformanceLevel.Auto,
             IgnoreWhitespace = true
         };
 
         // XML Name Table for namespace resolution in SSO SAML Parsing routine
-        private static readonly NameTable xmlNameTable = new NameTable();
+        private readonly NameTable _xmlNameTable = new NameTable();
 
         /// XML Namespace Manager for namespace resolution in SSO SAML Parsing routine
-        private static XmlNamespaceManager xmlNamespaceManager;
+        private readonly XmlNamespaceManager _xmlNamespaceManager;
 
         private readonly ShellSettings _settings;
         private readonly ITicketValidatorFactory _ticketValidatorFactory;
@@ -66,11 +66,11 @@ namespace NGM.CasClient.Client {
             _authenticationService = authenticationService;
             _casServices = casServices;
 
-            xmlNamespaceManager = new XmlNamespaceManager(xmlNameTable);
-            xmlNamespaceManager.AddNamespace("cas", "http://www.yale.edu/tp/cas");
-            xmlNamespaceManager.AddNamespace("saml", "urn: oasis:names:tc:SAML:1.0:assertion");
-            xmlNamespaceManager.AddNamespace("saml2", "urn: oasis:names:tc:SAML:1.0:assertion");
-            xmlNamespaceManager.AddNamespace("samlp", "urn: oasis:names:tc:SAML:1.0:protocol");
+            _xmlNamespaceManager = new XmlNamespaceManager(_xmlNameTable);
+            _xmlNamespaceManager.AddNamespace("cas", "http://www.yale.edu/tp/cas");
+            _xmlNamespaceManager.AddNamespace("saml", "urn: oasis:names:tc:SAML:1.0:assertion");
+            _xmlNamespaceManager.AddNamespace("saml2", "urn: oasis:names:tc:SAML:1.0:assertion");
+            _xmlNamespaceManager.AddNamespace("samlp", "urn: oasis:names:tc:SAML:1.0:protocol");
 
             Logger = NullLogger.Instance;
             T = NullLocalizer.Instance;
@@ -799,13 +799,13 @@ namespace NGM.CasClient.Client {
         /// </summary>
         /// <param name="xmlAsString">SAML message from CAS server</param>
         /// <returns>The CAS ticket contained in SAML message</returns>
-        private static string ExtractSingleSignOutTicketFromSamlResponse(string xmlAsString) {
-            XmlParserContext xmlParserContext = new XmlParserContext(null, xmlNamespaceManager, null, XmlSpace.None);
+        private string ExtractSingleSignOutTicketFromSamlResponse(string xmlAsString) {
+            XmlParserContext xmlParserContext = new XmlParserContext(null, _xmlNamespaceManager, null, XmlSpace.None);
 
             string elementText = null;
             if (!String.IsNullOrEmpty(xmlAsString) && !String.IsNullOrEmpty(XML_SESSION_INDEX_ELEMENT_NAME)) {
                 using (TextReader textReader = new StringReader(xmlAsString)) {
-                    XmlReader reader = XmlReader.Create(textReader, xmlReaderSettings, xmlParserContext);
+                    XmlReader reader = XmlReader.Create(textReader, XmlReaderSettings, xmlParserContext);
                     bool foundElement = reader.ReadToFollowing(XML_SESSION_INDEX_ELEMENT_NAME);
                     if (foundElement) {
                         elementText = reader.ReadElementString();
